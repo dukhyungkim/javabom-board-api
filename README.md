@@ -1,1 +1,1 @@
-# javabom-board
+# javabom-board-api
