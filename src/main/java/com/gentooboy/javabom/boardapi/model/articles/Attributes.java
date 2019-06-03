@@ -11,7 +11,6 @@ public class Attributes {
   String title;
   String body;
 
-  @Builder
   public Attributes(String title, String body) {
     this.title = title;
     this.body = body;

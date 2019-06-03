@@ -1,5 +1,6 @@
 package com.gentooboy.javabom.boardapi.service;
 
+import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.articles.Attributes;
 import com.gentooboy.javabom.boardapi.model.articles.Links;
@@ -16,4 +17,9 @@ public class ArticlesServiceImpl implements ArticlesService {
     return articleList;
   }
 
+  public Article findArticleById(Long articleId) throws ArticleNotFoundException {
+    Article article = Article.builder().build();
+
+    return article;
+  }
 }

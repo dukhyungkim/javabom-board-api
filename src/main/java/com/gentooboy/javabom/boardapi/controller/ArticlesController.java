@@ -1,10 +1,10 @@
 package com.gentooboy.javabom.boardapi.controller;
 
+import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.response.ArticleData;
 import com.gentooboy.javabom.boardapi.model.response.ArticleListData;
 import com.gentooboy.javabom.boardapi.service.ArticlesService;
-import java.util.Collections;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,4 +37,20 @@ public class ArticlesController {
     return new ResponseEntity<>(articleListData, HttpStatus.OK);
   }
 
+  @GetMapping("/{articleId}")
+  public ResponseEntity<ArticleData> getArticle(@PathVariable Long articleId)
+      throws ArticleNotFoundException {
+    Article article;
+
+    try {
+      article = articlesService.findArticleById(articleId);
+    } catch (ArticleNotFoundException ex) {
+      throw ex;
+    }
+
+    ArticleData articleData = new ArticleData();
+    articleData.setData(article);
+
+    return new ResponseEntity<>(articleData, HttpStatus.OK);
+  }
 }
