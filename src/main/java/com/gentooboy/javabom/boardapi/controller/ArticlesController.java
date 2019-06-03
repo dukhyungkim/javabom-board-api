@@ -25,12 +25,12 @@ public class ArticlesController {
 
   @GetMapping("")
   public ResponseEntity<ArticleListData> getArticleList() {
-    List<Article> list = articlesService.findAllArticles();
+    List<Article> allArticles = articlesService.findAllArticles();
 
     ArticleListData articleListData = new ArticleListData();
-    articleListData.setData(list);
+    articleListData.setData(allArticles);
 
-    if (list.size() == 0) {
+    if (allArticles.size() == 0) {
       return new ResponseEntity<>(articleListData, HttpStatus.NO_CONTENT);
     }
 
