@@ -10,7 +10,6 @@ public class Links {
 
   String self;
 
-  @Builder
   public Links(String self) {
     this.self = self;
   }
