@@ -1,5 +1,6 @@
-package com.gentooboy.javabom.boardapi.model.articles;
+package com.gentooboy.javabom.boardapi.model.request;
 
+import com.gentooboy.javabom.boardapi.model.articles.Attributes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,10 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class Article {
-
+public class NewArticle {
   String type;
-  String id;
   Attributes attributes;
-  Links links;
 }
