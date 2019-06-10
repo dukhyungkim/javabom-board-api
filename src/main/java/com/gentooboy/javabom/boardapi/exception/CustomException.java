@@ -1,4 +1,4 @@
-package com.gentooboy.javabom.boardapi.model.articles;
+package com.gentooboy.javabom.boardapi.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Attributes {
+class CustomException extends Exception {
 
+  String status;
   String title;
-  String body;
+  String detail;
 }
