@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,12 +18,11 @@ import com.gentooboy.javabom.boardapi.model.articles.Links;
 import com.gentooboy.javabom.boardapi.model.error.Errors;
 import com.gentooboy.javabom.boardapi.model.error.Source;
 import com.gentooboy.javabom.boardapi.model.request.NewArticle;
-import com.gentooboy.javabom.boardapi.model.request.NewArticleData;
+import com.gentooboy.javabom.boardapi.model.response.ArticleData;
 import com.gentooboy.javabom.boardapi.service.ArticlesService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +52,10 @@ public class ArticlesControllerTest {
   private static final String BASE_URL = "/articles";
   private static final String ENCODING = "utf-8";
 
-  private Article article1;
-  private Article article2;
+  private final Article article1;
+  private final Article article2;
 
-  @Before
-  public void setup() {
+  public ArticlesControllerTest() {
     article1 = Article.builder()
         .type("articles")
         .id("1")
@@ -123,7 +122,7 @@ public class ArticlesControllerTest {
 
   @Test
   public void getArticleListReturnNoContent() throws Exception {
-    List<Article> articleList = Collections.emptyList();
+    final List<Article> articleList = Collections.emptyList();
 
     when(service.findAllArticles())
         .thenReturn(articleList);
@@ -142,7 +141,7 @@ public class ArticlesControllerTest {
     when(service.findArticleById(1L))
         .thenReturn(article1);
 
-    final String url = BASE_URL + "/1";
+    final String url = BASE_URL + "/" + article1.getId();
     final ResultActions actions = mockMvc.perform(get(url)
         .characterEncoding(ENCODING));
 
@@ -159,10 +158,8 @@ public class ArticlesControllerTest {
 
   @Test
   public void getArticleReturnErrorNotFound() throws Exception {
-    Errors errors = Errors.builder()
-        .status(String.valueOf(HttpStatus.NOT_FOUND.value()))
+    final Errors errors = Errors.builder()
         .source(new Source("/data/type/articles/0"))
-        .title(HttpStatus.NOT_FOUND.getReasonPhrase())
         .detail("The article id 0 is not found.")
         .build();
 
@@ -177,20 +174,20 @@ public class ArticlesControllerTest {
         .andExpect(status().isNotFound())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
         .andExpect(jsonPath("$.errors.size()").value(4))
-        .andExpect(jsonPath("$.errors.status").value(errors.getStatus()))
+        .andExpect(jsonPath("$.errors.status").value(String.valueOf(HttpStatus.NOT_FOUND.value())))
         .andExpect(jsonPath("$.errors.source.pointer").value(errors.getSource().getPointer()))
-        .andExpect(jsonPath("$.errors.title").value(errors.getTitle()))
+        .andExpect(jsonPath("$.errors.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
         .andExpect(jsonPath("$.errors.detail").value(errors.getDetail()));
   }
 
   @Test
   public void newArticleReturnSuccess() throws Exception {
-    NewArticle newArticle = NewArticle.builder()
+    final NewArticle newArticle = NewArticle.builder()
         .type(article1.getType())
         .attributes(
             new Attributes(article1.getAttributes().getTitle(), article1.getAttributes().getBody()))
         .build();
-    NewArticleData newArticleData = new NewArticleData(newArticle);
+    final ArticleData newArticleData = new ArticleData<>(newArticle);
 
     when(service.saveArticle(any(NewArticle.class))).thenReturn(article1);
 
@@ -211,22 +208,23 @@ public class ArticlesControllerTest {
   }
 
   @Test
-  public void newArticleReturnInternalServerError() throws Exception {
-    NewArticle newArticle = NewArticle.builder()
+  public void newArticleReturnSaveError() throws Exception {
+    final NewArticle newArticle = NewArticle.builder()
         .type(article1.getType())
         .attributes(
             new Attributes(article1.getAttributes().getTitle(), article1.getAttributes().getBody()))
         .build();
-    NewArticleData newArticleData = new NewArticleData(newArticle);
+    ArticleData newArticleData = new ArticleData<>(newArticle);
 
-    Errors errors = Errors.builder()
-        .status(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+    final Errors errors = Errors.builder()
         .source(new Source("/data/type/articles"))
-        .title(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-        .detail("Can't save the article to database.")
+        .detail("Can't save the article.")
         .build();
 
-    when(service.saveArticle(any(NewArticle.class))).thenThrow(new ArticleSaveErrorException(errors.getStatus(), errors.getTitle(), errors.getDetail()));
+    final ArticleSaveErrorException exception = new ArticleSaveErrorException(null, null,
+        errors.getDetail());
+
+    when(service.saveArticle(any(NewArticle.class))).thenThrow(exception);
 
     final ResultActions actions = mockMvc.perform(post(BASE_URL)
         .contentType(MediaType.APPLICATION_JSON)
@@ -237,9 +235,92 @@ public class ArticlesControllerTest {
         .andExpect(status().isInternalServerError())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
         .andExpect(jsonPath("$.errors.size()").value(4))
-        .andExpect(jsonPath("$.errors.status").value(errors.getStatus()))
+        .andExpect(jsonPath("$.errors.status").value(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value())))
         .andExpect(jsonPath("$.errors.source.pointer").value(errors.getSource().getPointer()))
-        .andExpect(jsonPath("$.errors.title").value(errors.getTitle()))
+        .andExpect(jsonPath("$.errors.title").value(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()))
+        .andExpect(jsonPath("$.errors.detail").value(errors.getDetail()));
+  }
+
+  @Test
+  public void updateArticleReturnSuccess() throws Exception {
+    final ArticleData articleData = new ArticleData<>(article1);
+
+    when(service.updateArticle(any(Long.class), any(Article.class))).thenReturn(article1);
+
+    final String url = BASE_URL + "/" + article1.getId();
+    final ResultActions actions = mockMvc.perform(put(url)
+        .contentType(MediaType.APPLICATION_JSON)
+        .characterEncoding(ENCODING)
+        .content(objectMapper.writeValueAsString(articleData)));
+
+    actions
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.data.size()").value(4))
+        .andExpect(jsonPath("$.data.type").value(article1.getType()))
+        .andExpect(jsonPath("$.data.id").value(article1.getId()))
+        .andExpect(jsonPath("$.data.attributes.title").value(article1.getAttributes().getTitle()))
+        .andExpect(jsonPath("$.data.attributes.body").value(article1.getAttributes().getBody()))
+        .andExpect(jsonPath("$.data.links.self").value(article1.getLinks().getSelf()));
+  }
+
+  @Test
+  public void updateArticleReturnSaveError() throws Exception {
+    final ArticleData articleData = new ArticleData<>(article1);
+
+    final Errors errors = Errors.builder()
+        .source(new Source("/data/type/articles/1"))
+        .detail("Can't update the article.")
+        .build();
+
+    final ArticleSaveErrorException exception = new ArticleSaveErrorException(null, null,
+        errors.getDetail());
+
+    when(service.updateArticle(any(Long.class), any(Article.class))).thenThrow(exception);
+
+    final String url = BASE_URL + "/" + article1.getId();
+    final ResultActions actions = mockMvc.perform(put(url)
+        .contentType(MediaType.APPLICATION_JSON)
+        .characterEncoding(ENCODING)
+        .content(objectMapper.writeValueAsString(articleData)));
+
+    actions
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.errors.size()").value(4))
+        .andExpect(jsonPath("$.errors.status").value(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value())))
+        .andExpect(jsonPath("$.errors.source.pointer").value(errors.getSource().getPointer()))
+        .andExpect(jsonPath("$.errors.title").value(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()))
+        .andExpect(jsonPath("$.errors.detail").value(errors.getDetail()));
+  }
+
+  @Test
+  public void updateArticleReturnNotFound() throws Exception {
+    final ArticleData articleData = new ArticleData<>(article1);
+
+    final Errors errors = Errors.builder()
+        .source(new Source("/data/type/articles/1"))
+        .detail("Can't fine the article.")
+        .build();
+
+    final ArticleNotFoundException exception = new ArticleNotFoundException(null, null,
+        errors.getDetail());
+
+    when(service.updateArticle(any(Long.class), any(Article.class))).thenThrow(exception);
+
+    final String url = BASE_URL + "/" + article1.getId();
+    final ResultActions actions = mockMvc.perform(put(url)
+        .contentType(MediaType.APPLICATION_JSON)
+        .characterEncoding(ENCODING)
+        .content(objectMapper.writeValueAsString(articleData)));
+
+    actions
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.errors.size()").value(4))
+        .andExpect(jsonPath("$.errors.status").value(String.valueOf(HttpStatus.NOT_FOUND.value())))
+        .andExpect(jsonPath("$.errors.source.pointer").value(errors.getSource().getPointer()))
+        .andExpect(jsonPath("$.errors.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
         .andExpect(jsonPath("$.errors.detail").value(errors.getDetail()));
   }
 }

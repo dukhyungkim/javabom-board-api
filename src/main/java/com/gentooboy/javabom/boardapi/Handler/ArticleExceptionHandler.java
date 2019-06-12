@@ -19,7 +19,7 @@ public class ArticleExceptionHandler extends ResponseEntityExceptionHandler {
   private final String DATA_TYPE = "/data/type";
 
   @ExceptionHandler(ArticleNotFoundException.class)
-  public ResponseEntity<ErrorData> articleNotFoundHandle(Exception ex, WebRequest request) {
+  public ResponseEntity<ErrorData> articleNotFoundHandle(final Exception ex, final WebRequest request) {
     final String uri = ((ServletWebRequest)request).getRequest().getRequestURI();
     final ArticleNotFoundException exception = (ArticleNotFoundException) ex;
     Errors errors = Errors.builder()
@@ -32,7 +32,7 @@ public class ArticleExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(ArticleSaveErrorException.class)
-  public ResponseEntity<ErrorData> articleSaveErrorHandle(Exception ex, WebRequest request) {
+  public ResponseEntity<ErrorData> articleSaveErrorHandle(final Exception ex, final WebRequest request) {
     final String uri = ((ServletWebRequest)request).getRequest().getRequestURI();
     final ArticleSaveErrorException exception = (ArticleSaveErrorException) ex;
     Errors errors = Errors.builder()
