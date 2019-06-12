@@ -1,6 +1,6 @@
 language: java
 jdk:
-- openjdk11
+  - openjdk11
 cache:
   - .autoconf
   - $HOME/.m2
