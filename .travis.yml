@@ -1,6 +1,10 @@
 language: java
 jdk:
-- openjdk11
+  - openjdk11
+cache:
+  directories:
+    - .autoconf
+    - $HOME/.m2
 notifications:
   slack:
     secure: JU6ohkEDIxgPG8pNIwRaopC9Sjx0l4blPJ6JdwYNIWpxMW9CsBMfLAf9DxAAJy3W++P+O501iB4KtjvbBkmoJb2dCAC22VbaM4pLzIDr2YxDcDRyldUx3yOcUCZc9uF5XdZiiM+b4lkGT7144K6kzEHZhFrtxYO2wO+/FKVzK3gYpY6HIDdZ8CQQIjoMXm96AOFz4j0SC5fPrpcVz3ZeH4efNXvm2m5YBv7+TcPcdxqEqQ7ixphq50jVSjL1IxcuiBDuRlfyQWFG3UjM5oA2jWo2jYtKtJ7EKv/RIqficK8VbVUcpskFxye9SQO928wHJVn+Y7fqNpFSJWu/oEAnOm3vsCMEHbWbGlWZ0lWQXXhSOQPqnYFKIPCaVdtaxLx4tl0dVC7pCtJ31o8DwKJOv23CFaP3C7iM7qeCVU0PA1gxtMgFkHvcFJYTFPxnsyu1tnL7IcdDGRmffL0pIJfS42H57QhVt/fuAgEIBA1xIPnsHrw/LkGxnCy5Docc8BchEWGqb7g5hlp7bDEsSq6oSxcBgSqTT6nP1Lm4BhNd2McL7DMuCH3cEql6T2zN/stjunPlz3O3w90ZPzlDw958bpEEKz/ox6LVKN5QXGFwk3iFiAWbN5Jh2kucd55YdbCbWDMzmGJXV981HUH+5I2ZAVl86+oWYFTaNR09O5TXC5w=
