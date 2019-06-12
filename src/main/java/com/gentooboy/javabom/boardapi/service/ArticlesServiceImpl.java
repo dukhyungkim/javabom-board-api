@@ -28,4 +28,11 @@ public class ArticlesServiceImpl implements ArticlesService {
 
     return Article.builder().build();
   }
+
+  @Override
+  public Article updateArticle(Long articleId, Article article)
+      throws ArticleSaveErrorException, ArticleNotFoundException {
+
+    return Article.builder().build();
+  }
 }
