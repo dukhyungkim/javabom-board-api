@@ -1,9 +1,7 @@
 package com.gentooboy.javabom.boardapi.service;
 
 import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
-import com.gentooboy.javabom.boardapi.exception.ArticleSaveErrorException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
-import com.gentooboy.javabom.boardapi.model.request.NewArticle;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,20 +16,19 @@ public class ArticlesServiceImpl implements ArticlesService {
   }
 
   @Override
-  public Article findArticleById(Long articleId) throws ArticleNotFoundException {
+  public Article findArticleById(String articleId) throws ArticleNotFoundException {
 
     return Article.builder().build();
   }
 
   @Override
-  public Article saveArticle(NewArticle newArticle) throws ArticleSaveErrorException {
+  public Article saveArticle(Article newArticle) {
 
     return Article.builder().build();
   }
 
   @Override
-  public Article updateArticle(Long articleId, Article article)
-      throws ArticleSaveErrorException, ArticleNotFoundException {
+  public Article updateArticle(String articleId, Article article) throws ArticleNotFoundException {
 
     return Article.builder().build();
   }

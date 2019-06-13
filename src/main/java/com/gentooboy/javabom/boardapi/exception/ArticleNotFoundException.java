@@ -1,8 +1,8 @@
 package com.gentooboy.javabom.boardapi.exception;
 
-public class ArticleNotFoundException extends CustomException {
+public class ArticleNotFoundException extends RuntimeException {
 
-  public ArticleNotFoundException(String status, String title, String detail) {
-    super(status, title, detail);
+  public ArticleNotFoundException(String message) {
+    super(message);
   }
 }
