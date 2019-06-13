@@ -15,4 +15,6 @@ public interface ArticlesService {
   Article saveArticle(NewArticle newArticle) throws ArticleSaveErrorException;
 
   Article updateArticle(Long articleId, Article article) throws ArticleSaveErrorException, ArticleNotFoundException;
+
+  String deleteArticle(String articleId);
 }

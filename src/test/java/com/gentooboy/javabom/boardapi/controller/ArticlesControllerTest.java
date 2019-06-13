@@ -2,6 +2,7 @@ package com.gentooboy.javabom.boardapi.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -322,5 +323,22 @@ public class ArticlesControllerTest {
         .andExpect(jsonPath("$.errors.source.pointer").value(errors.getSource().getPointer()))
         .andExpect(jsonPath("$.errors.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
         .andExpect(jsonPath("$.errors.detail").value(errors.getDetail()));
+  }
+
+  @Test
+  public void deleteArticleReturnSuccess() throws Exception {
+    when(service.deleteArticle(article1.getId())).thenReturn(article1.getId());
+
+    final String url = BASE_URL + "/" + article1.getId();
+    final ResultActions actions = mockMvc.perform(delete(url)
+        .contentType(MediaType.APPLICATION_JSON)
+        .characterEncoding(ENCODING));
+
+    actions
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.size()").value(1))
+        .andExpect(jsonPath("$.data").value(""));
+
   }
 }

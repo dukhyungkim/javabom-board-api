@@ -35,4 +35,9 @@ public class ArticlesServiceImpl implements ArticlesService {
 
     return Article.builder().build();
   }
+
+  @Override
+  public String deleteArticle(String articleId) {
+    return articleId;
+  }
 }
