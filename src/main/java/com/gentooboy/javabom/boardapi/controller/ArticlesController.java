@@ -9,6 +9,7 @@ import com.gentooboy.javabom.boardapi.service.ArticlesService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -90,5 +91,17 @@ public class ArticlesController {
     }
 
     return new ResponseEntity<>(new ArticleData(article), HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{articleId}")
+  public ResponseEntity<ArticleData<String>> deleteArticle(@PathVariable final String articleId) {
+    final String deletedId = articlesService.deleteArticle(articleId);
+
+    if (!deletedId.equals(articleId)) {
+      // TODO: handle error
+      System.out.println("TODO: handle error");
+    }
+
+    return new ResponseEntity<>(new ArticleData<>(""), HttpStatus.OK);
   }
 }
