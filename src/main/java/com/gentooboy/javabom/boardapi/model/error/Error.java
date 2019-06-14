@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class Errors {
+public class Error {
 
-  String status;
-  Source source;
-  String title;
-  String detail;
+  private int status;
+  private Source source;
+  private String title;
+  private String message;
 }

@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Attributes {
 
-  String title;
-  String body;
+  private String title;
+  private String content;
 }

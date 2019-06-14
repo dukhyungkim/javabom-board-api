@@ -1,9 +1,7 @@
 package com.gentooboy.javabom.boardapi.controller;
 
 import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
-import com.gentooboy.javabom.boardapi.exception.ArticleSaveErrorException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
-import com.gentooboy.javabom.boardapi.model.request.NewArticle;
 import com.gentooboy.javabom.boardapi.model.response.ArticleData;
 import com.gentooboy.javabom.boardapi.service.ArticlesService;
 import java.util.List;
@@ -29,7 +27,7 @@ public class ArticlesController {
   }
 
   @GetMapping("")
-  public ResponseEntity<ArticleData<Article>> getArticleList() {
+  public ResponseEntity<ArticleData> getArticleList() {
     List<Article> allArticles = articlesService.findAllArticles();
 
     ArticleData articleData = new ArticleData<>(allArticles);
@@ -42,59 +40,35 @@ public class ArticlesController {
   }
 
   @GetMapping("/{articleId}")
-  public ResponseEntity<ArticleData> getArticle(@PathVariable final Long articleId)
+  public ResponseEntity<ArticleData> getArticle(@PathVariable final String articleId)
       throws ArticleNotFoundException {
     Article article;
 
-    try {
-      article = articlesService.findArticleById(articleId);
-    } catch (ArticleNotFoundException e) {
-      e.setStatus(String.valueOf(HttpStatus.NOT_FOUND.value()));
-      e.setTitle(HttpStatus.NOT_FOUND.getReasonPhrase());
-      throw e;
-    }
+    article = articlesService.findArticleById(articleId);
 
-    return new ResponseEntity<>(new ArticleData(article), HttpStatus.OK);
+    return new ResponseEntity<>(new ArticleData<>(article), HttpStatus.OK);
   }
 
   @PostMapping("")
-  public ResponseEntity<ArticleData> newArticle(@RequestBody final ArticleData<NewArticle> articleData)
-      throws ArticleSaveErrorException {
+  public ResponseEntity<?> newArticle(@RequestBody final ArticleData<Article> articleData) {
     Article article;
 
-    try {
-      article = articlesService.saveArticle(articleData.getData());
-    } catch (ArticleSaveErrorException e) {
-      e.setStatus(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-      e.setTitle(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-      throw e;
-    }
+    article = articlesService.saveArticle(articleData.getData());
 
-    return new ResponseEntity<>(new ArticleData(article), HttpStatus.CREATED);
+    return new ResponseEntity<>(new ArticleData<>(article), HttpStatus.CREATED);
   }
 
   @PutMapping("/{articleId}")
-  public ResponseEntity<ArticleData> editArticle(@PathVariable final Long articleId, @RequestBody final ArticleData<Article> articleData)
-      throws ArticleSaveErrorException, ArticleNotFoundException {
-    Article article;
+  public ResponseEntity<ArticleData> editArticle(@PathVariable final String articleId,
+      @RequestBody final ArticleData<Article> articleData)
+      throws ArticleNotFoundException {
+    Article article = articlesService.updateArticle(articleId, articleData.getData());
 
-    try {
-      article = articlesService.updateArticle(articleId, articleData.getData());
-    } catch (ArticleSaveErrorException e) {
-      e.setStatus(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-      e.setTitle(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-      throw e;
-    } catch (ArticleNotFoundException e) {
-      e.setStatus(String.valueOf(HttpStatus.NOT_FOUND.value()));
-      e.setTitle(HttpStatus.NOT_FOUND.getReasonPhrase());
-      throw e;
-    }
-
-    return new ResponseEntity<>(new ArticleData(article), HttpStatus.OK);
+    return new ResponseEntity<>(new ArticleData<>(article), HttpStatus.OK);
   }
 
   @DeleteMapping("/{articleId}")
-  public ResponseEntity<ArticleData<String>> deleteArticle(@PathVariable final String articleId) {
+  public ResponseEntity<ArticleData> deleteArticle(@PathVariable final String articleId) {
     final String deletedId = articlesService.deleteArticle(articleId);
 
     if (!deletedId.equals(articleId)) {

@@ -9,5 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Source {
 
-  String pointer;
+  private String pointer;
 }

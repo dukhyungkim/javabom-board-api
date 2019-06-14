@@ -11,8 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Article {
 
-  String type;
-  String id;
-  Attributes attributes;
-  Links links;
+  private String type;
+  private String id;
+  private Attributes attributes;
+  private Links links;
 }
