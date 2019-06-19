@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gentooboy.javabom.boardapi.constant.ArticleConst;
 import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.articles.Attributes;
@@ -50,29 +51,32 @@ public class ArticlesControllerTest {
   @Autowired
   ObjectMapper objectMapper;
 
-  private static final String BASE_URL = "/articles";
+  private static final String BASE_URL = ArticleConst.CONTEXT_ARTICLE;
   private static final String ENCODING = "utf-8";
 
   private final Article article1;
   private final Article article2;
 
   public ArticlesControllerTest() {
+    String articleId = "1";
     article1 = Article.builder()
-        .type("articles")
-        .id("1")
+        .type(ArticleConst.TYPE_ARTICLES)
+        .id(articleId)
         .attributes(new Attributes("Initial Article", "This is content of article"))
-        .links(new Links("https://board-api/api/v1/articles/1"))
+        .links(new Links(ArticleConst.CONTEXT_PATH + BASE_URL + "/" + articleId))
         .build();
+
+    articleId = "2";
     article2 = Article.builder()
-        .type("articles")
-        .id("2")
+        .type(ArticleConst.TYPE_ARTICLES)
+        .id(articleId)
         .attributes(new Attributes("New Article", "This is content of new article"))
-        .links(new Links("https://board-api/api/v1/articles/2"))
+        .links(new Links(ArticleConst.CONTEXT_PATH + BASE_URL + "/" + articleId))
         .build();
   }
 
   @Test
-  public void getArticleListReturnSuccessSingleData() throws Exception {
+  public void whenGetArticleList_thenReturnSuccessSingleData() throws Exception {
     List<Article> articleList = new ArrayList<>();
     articleList.add(article1);
 
@@ -85,17 +89,16 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.data.size()").value(1))
+        .andExpect(jsonPath("$.data.size()").value(articleList.size()))
         .andExpect(jsonPath("$.data[0].type").value(article1.getType()))
         .andExpect(jsonPath("$.data[0].id").value(article1.getId()))
-        .andExpect(
-            jsonPath("$.data[0].attributes.title").value(article1.getAttributes().getTitle()))
+        .andExpect(jsonPath("$.data[0].attributes.title").value(article1.getAttributes().getTitle()))
         .andExpect(jsonPath("$.data[0].attributes.content").value(article1.getAttributes().getContent()))
         .andExpect(jsonPath("$.data[0].links.self").value(article1.getLinks().getSelf()));
   }
 
   @Test
-  public void getArticleListReturnSuccessMultipleData() throws Exception {
+  public void whenGetArticleList_thenReturnSuccessMultipleData() throws Exception {
     List<Article> articleList = new ArrayList<>();
     articleList.add(article1);
     articleList.add(article2);
@@ -109,23 +112,21 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.data.size()").value(2))
+        .andExpect(jsonPath("$.data.size()").value(articleList.size()))
         .andExpect(jsonPath("$.data[0].type").value(article1.getType()))
         .andExpect(jsonPath("$.data[0].id").value(article1.getId()))
-        .andExpect(
-            jsonPath("$.data[0].attributes.title").value(article1.getAttributes().getTitle()))
+        .andExpect(jsonPath("$.data[0].attributes.title").value(article1.getAttributes().getTitle()))
         .andExpect(jsonPath("$.data[0].attributes.content").value(article1.getAttributes().getContent()))
         .andExpect(jsonPath("$.data[0].links.self").value(article1.getLinks().getSelf()))
         .andExpect(jsonPath("$.data[1].type").value(article2.getType()))
         .andExpect(jsonPath("$.data[1].id").value(article2.getId()))
-        .andExpect(
-            jsonPath("$.data[1].attributes.title").value(article2.getAttributes().getTitle()))
+        .andExpect(jsonPath("$.data[1].attributes.title").value(article2.getAttributes().getTitle()))
         .andExpect(jsonPath("$.data[1].attributes.content").value(article2.getAttributes().getContent()))
         .andExpect(jsonPath("$.data[1].links.self").value(article2.getLinks().getSelf()));
   }
 
   @Test
-  public void getArticleListReturnNoContent() throws Exception {
+  public void whenGetArticleList_thenReturnNoContent() throws Exception {
     final List<Article> articleList = Collections.emptyList();
 
     when(service.findAllArticles())
@@ -137,13 +138,12 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isNoContent())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.data.size()").value(0));
+        .andExpect(jsonPath("$.data.size()").value(articleList.size()));
   }
 
   @Test
-  public void getArticleReturnSuccess() throws Exception {
-    when(service.findArticleById(article1.getId()))
-        .thenReturn(article1);
+  public void whenGetArticle_thenReturnSuccess() throws Exception {
+    when(service.findArticleById(article1.getId())).thenReturn(article1);
 
     final String url = BASE_URL + "/" + article1.getId();
     final ResultActions actions = mockMvc.perform(get(url)
@@ -161,14 +161,15 @@ public class ArticlesControllerTest {
   }
 
   @Test
-  public void getArticleReturnErrorNotFound() throws Exception {
+  public void whenGetArticle_thenReturnErrorNotFound() throws Exception {
     final String articleId = "0";
     final Error error = Error.builder()
         .source(new Source("/data/type/articles/" + articleId))
-        .message("Can't fine the article.")
+        .message(ArticleConst.MESSAGE_NOT_FOUND)
         .build();
 
-    when(service.findArticleById(eq("0"))).thenThrow(new ArticleNotFoundException(error.getMessage()));
+    when(service.findArticleById(eq("0")))
+        .thenThrow(new ArticleNotFoundException(error.getMessage()));
 
     final String url = BASE_URL + "/" + articleId;
     final ResultActions actions = mockMvc.perform(get(url)
@@ -184,11 +185,12 @@ public class ArticlesControllerTest {
   }
 
   @Test
-  public void newArticleReturnSuccess() throws Exception {
+  public void whenNewArticle_thenReturnSuccess() throws Exception {
     final Article newArticle = Article.builder()
         .type(article1.getType())
         .attributes(
-            new Attributes(article1.getAttributes().getTitle(), article1.getAttributes().getContent()))
+            new Attributes(article1.getAttributes().getTitle(),
+                article1.getAttributes().getContent()))
         .build();
     final ArticleData newArticleData = new ArticleData<>(newArticle);
 
@@ -212,7 +214,7 @@ public class ArticlesControllerTest {
   }
 
   @Test
-  public void updateArticleReturnSuccess() throws Exception {
+  public void whenUpdateArticle_thenReturnSuccess() throws Exception {
     final ArticleData articleData = new ArticleData<>(article1);
 
     when(service.updateArticle(eq(article1.getId()), any(Article.class))).thenReturn(article1);
@@ -235,10 +237,10 @@ public class ArticlesControllerTest {
   }
 
   @Test
-  public void updateArticleReturnNotFound() throws Exception {
+  public void whenUpdateArticle_thenReturnNotFound() throws Exception {
     final Error error = Error.builder()
         .source(new Source("/data/type/articles/" + article1.getId()))
-        .message("Can't fine the article.")
+        .message(ArticleConst.MESSAGE_NOT_FOUND)
         .build();
 
     final ArticleData articleData = new ArticleData<>(article1);
@@ -264,9 +266,7 @@ public class ArticlesControllerTest {
   }
 
   @Test
-  public void deleteArticleReturnSuccess() throws Exception {
-    when(service.deleteArticle(article1.getId())).thenReturn(article1.getId());
-
+  public void whenDeleteArticle_thenReturnSuccess() throws Exception {
     final String url = BASE_URL + "/" + article1.getId();
     final ResultActions actions = mockMvc.perform(delete(url)
         .contentType(MediaType.APPLICATION_JSON)
@@ -277,6 +277,5 @@ public class ArticlesControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
         .andExpect(jsonPath("$.size()").value(1))
         .andExpect(jsonPath("$.data").value(""));
-
   }
 }

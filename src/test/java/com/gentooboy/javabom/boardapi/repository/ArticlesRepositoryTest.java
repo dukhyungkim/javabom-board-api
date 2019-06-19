@@ -16,10 +16,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ArticleRepositoryTest {
+public class ArticlesRepositoryTest {
 
   @Autowired
-  private ArticleRepository articleRepository;
+  private ArticlesRepository articlesRepository;
 
   private ArticleEntity articleEntity1;
   private ArticleEntity articleEntity2;
@@ -35,15 +35,15 @@ public class ArticleRepositoryTest {
         .content("This is other article")
         .build();
 
-    articleRepository.deleteAll();
+    articlesRepository.deleteAll();
   }
 
   @Test
   public void whenFindAll_thenReturnArticles() {
-    articleRepository.save(articleEntity1);
-    articleRepository.save(articleEntity2);
+    articlesRepository.save(articleEntity1);
+    articlesRepository.save(articleEntity2);
 
-    List<ArticleEntity> foundList = articleRepository.findAll();
+    List<ArticleEntity> foundList = articlesRepository.findAll();
     assertThat(foundList.size()).isEqualTo(2);
 
     ArticleEntity found = foundList.get(0);
@@ -62,10 +62,10 @@ public class ArticleRepositoryTest {
 
   @Test
   public void whenFindById_thenReturnArticle() {
-    articleRepository.save(articleEntity1);
-    articleRepository.save(articleEntity2);
+    articlesRepository.save(articleEntity1);
+    articlesRepository.save(articleEntity2);
 
-    Optional<ArticleEntity> entityOptional = articleRepository.findById(articleEntity2.getId());
+    Optional<ArticleEntity> entityOptional = articlesRepository.findById(articleEntity2.getId());
     assertThat(entityOptional.isPresent()).isTrue();
 
     ArticleEntity found = entityOptional.orElse(null);
@@ -77,8 +77,8 @@ public class ArticleRepositoryTest {
 
   @Test
   public void whenSave_thenUpdateArticle() {
-    articleRepository.save(articleEntity1);
-    articleRepository.save(articleEntity2);
+    articlesRepository.save(articleEntity1);
+    articlesRepository.save(articleEntity2);
 
     ArticleEntity newArticleEntity = ArticleEntity.builder()
         .id(articleEntity1.getId())
@@ -86,9 +86,9 @@ public class ArticleRepositoryTest {
         .content("new content")
         .build();
 
-    articleRepository.save(newArticleEntity);
+    articlesRepository.save(newArticleEntity);
 
-    Optional<ArticleEntity> entityOptional = articleRepository.findById(newArticleEntity.getId());
+    Optional<ArticleEntity> entityOptional = articlesRepository.findById(newArticleEntity.getId());
     assertThat(entityOptional.isPresent()).isTrue();
 
     ArticleEntity found = entityOptional.orElse(null);
@@ -100,17 +100,17 @@ public class ArticleRepositoryTest {
 
   @Test
   public void whenSaveOnlyTitle_thenUpdateOnlyTitle() {
-    articleRepository.save(articleEntity1);
-    articleRepository.save(articleEntity2);
+    articlesRepository.save(articleEntity1);
+    articlesRepository.save(articleEntity2);
 
     ArticleEntity newArticleEntity = ArticleEntity.builder()
         .id(articleEntity1.getId())
         .title("new article")
         .build();
 
-    articleRepository.save(newArticleEntity);
+    articlesRepository.save(newArticleEntity);
 
-    Optional<ArticleEntity> entityOptional = articleRepository.findById(articleEntity1.getId());
+    Optional<ArticleEntity> entityOptional = articlesRepository.findById(articleEntity1.getId());
     assertThat(entityOptional.isPresent()).isTrue();
 
     ArticleEntity found = entityOptional.orElse(null);
@@ -127,17 +127,17 @@ public class ArticleRepositoryTest {
         .title("")
         .build();
 
-    articleRepository.save(newArticleEntity);
+    articlesRepository.save(newArticleEntity);
   }
 
   @Test
   public void whenDelete_thenDeleteArticle() {
-    articleRepository.save(articleEntity1);
-    articleRepository.save(articleEntity2);
+    articlesRepository.save(articleEntity1);
+    articlesRepository.save(articleEntity2);
 
-    articleRepository.delete(articleEntity1);
+    articlesRepository.delete(articleEntity1);
 
-    List<ArticleEntity> foundList = articleRepository.findAll();
+    List<ArticleEntity> foundList = articlesRepository.findAll();
     assertThat(foundList.size()).isEqualTo(1);
 
     ArticleEntity found = foundList.get(0);
@@ -146,18 +146,18 @@ public class ArticleRepositoryTest {
     assertThat(found.getTitle()).isEqualTo(articleEntity2.getTitle());
     assertThat(found.getContent()).isEqualTo(articleEntity2.getContent());
 
-    Optional<ArticleEntity> entityOptional = articleRepository.findById(articleEntity1.getId());
+    Optional<ArticleEntity> entityOptional = articlesRepository.findById(articleEntity1.getId());
     assertThat(entityOptional.isPresent()).isFalse();
   }
 
   @Test
   public void whenDeleteAll_thenDeleteAllArticles() {
-    articleRepository.save(articleEntity1);
-    articleRepository.save(articleEntity2);
+    articlesRepository.save(articleEntity1);
+    articlesRepository.save(articleEntity2);
 
-    articleRepository.deleteAll();
+    articlesRepository.deleteAll();
 
-    List<ArticleEntity> foundList = articleRepository.findAll();
+    List<ArticleEntity> foundList = articlesRepository.findAll();
     assertThat(foundList.size()).isEqualTo(0);
   }
 }
