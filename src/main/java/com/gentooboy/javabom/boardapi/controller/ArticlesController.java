@@ -1,5 +1,6 @@
 package com.gentooboy.javabom.boardapi.controller;
 
+import com.gentooboy.javabom.boardapi.constant.ArticleConst;
 import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.response.ArticleData;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/articles")
+@RequestMapping(ArticleConst.CONTEXT_ARTICLE)
 public class ArticlesController {
 
   private final ArticlesService articlesService;
@@ -69,12 +70,7 @@ public class ArticlesController {
 
   @DeleteMapping("/{articleId}")
   public ResponseEntity<ArticleData> deleteArticle(@PathVariable final String articleId) {
-    final String deletedId = articlesService.deleteArticle(articleId);
-
-    if (!deletedId.equals(articleId)) {
-      // TODO: handle error
-      System.out.println("TODO: handle error");
-    }
+    articlesService.deleteArticle(articleId);
 
     return new ResponseEntity<>(new ArticleData<>(""), HttpStatus.OK);
   }

@@ -8,11 +8,11 @@ public interface ArticlesService {
 
   List<Article> findAllArticles();
 
-  Article findArticleById(String articleId) throws ArticleNotFoundException;
+  Article findArticleById(final String articleId) throws ArticleNotFoundException;
 
-  Article saveArticle(Article newArticle);
+  Article saveArticle(final Article newArticle);
 
-  Article updateArticle(String articleId, Article article) throws ArticleNotFoundException;
+  Article updateArticle(final String articleId, Article article) throws ArticleNotFoundException;
 
-  String deleteArticle(String articleId);
+  void deleteArticle(final String articleId);
 }

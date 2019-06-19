@@ -1,5 +1,6 @@
 package com.gentooboy.javabom.boardapi.handler;
 
+import com.gentooboy.javabom.boardapi.constant.ArticleConst;
 import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.error.Error;
 import com.gentooboy.javabom.boardapi.model.error.Source;
@@ -15,15 +16,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ArticleExceptionHandler extends ResponseEntityExceptionHandler {
 
-  private static final String DATA_TYPE = "/data/type";
-
   @ExceptionHandler(ArticleNotFoundException.class)
   public ResponseEntity<ErrorData> handleArticleNotFound(final ArticleNotFoundException ex,
       final WebRequest request) {
     final String uri = ((ServletWebRequest) request).getRequest().getRequestURI();
     Error error = Error.builder()
         .status(HttpStatus.NOT_FOUND.value())
-        .source(new Source(DATA_TYPE + uri))
+        .source(new Source(ArticleConst.SOURCE_TYPE + uri))
         .title(HttpStatus.NOT_FOUND.getReasonPhrase())
         .message(ex.getMessage())
         .build();

@@ -13,4 +13,8 @@ public class BoardApiApplicationTests {
 	public void contextLoads() {
 	}
 
+	@Test
+	public void applicationContextTest() {
+		BoardApiApplication.main(new String[] {});
+	}
 }
