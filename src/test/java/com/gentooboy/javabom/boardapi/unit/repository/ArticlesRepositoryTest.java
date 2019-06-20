@@ -1,9 +1,10 @@
-package com.gentooboy.javabom.boardapi.repository;
+package com.gentooboy.javabom.boardapi.unit.repository;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gentooboy.javabom.boardapi.entity.ArticleEntity;
+import com.gentooboy.javabom.boardapi.repository.ArticlesRepository;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.ConstraintViolationException;
@@ -46,18 +47,17 @@ public class ArticlesRepositoryTest {
     List<ArticleEntity> foundList = articlesRepository.findAll();
     assertThat(foundList.size()).isEqualTo(2);
 
-    ArticleEntity found = foundList.get(0);
-    assertThat(found).isNotNull();
-    assertThat(found.getId()).isEqualTo(articleEntity1.getId());
-    assertThat(found.getTitle()).isEqualTo(articleEntity1.getTitle());
-    assertThat(found.getContent()).isEqualTo(articleEntity1.getContent());
+    ArticleEntity found1 = foundList.get(0);
+    assertThat(found1).isNotNull();
+    assertThat(found1.getId()).isEqualTo(articleEntity1.getId());
+    assertThat(found1.getTitle()).isEqualTo(articleEntity1.getTitle());
+    assertThat(found1.getContent()).isEqualTo(articleEntity1.getContent());
 
-    found = foundList.get(1);
-    assertThat(found).isNotNull();
-    assertThat(found.getId()).isEqualTo(articleEntity2.getId());
-    assertThat(found.getTitle()).isEqualTo(articleEntity2.getTitle());
-    assertThat(found.getContent()).isEqualTo(articleEntity2.getContent());
-
+    ArticleEntity found2 = foundList.get(1);
+    assertThat(found2).isNotNull();
+    assertThat(found2.getId()).isEqualTo(articleEntity2.getId());
+    assertThat(found2.getTitle()).isEqualTo(articleEntity2.getTitle());
+    assertThat(found2.getContent()).isEqualTo(articleEntity2.getContent());
   }
 
   @Test
@@ -118,16 +118,6 @@ public class ArticlesRepositoryTest {
     assertThat(found.getId()).isEqualTo(newArticleEntity.getId());
     assertThat(found.getTitle()).isEqualTo(newArticleEntity.getTitle());
     assertThat(found.getContent()).isEqualTo(articleEntity1.getContent());
-  }
-
-  @Test(expected = ConstraintViolationException.class)
-  public void whenSaveEmptyTitle_thenThrowException() {
-    ArticleEntity newArticleEntity = ArticleEntity.builder()
-        .id(articleEntity1.getId())
-        .title("")
-        .build();
-
-    articlesRepository.save(newArticleEntity);
   }
 
   @Test
