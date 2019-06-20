@@ -1,4 +1,4 @@
-package com.gentooboy.javabom.boardapi.service;
+package com.gentooboy.javabom.boardapi.unit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,6 +10,8 @@ import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.articles.Attributes;
 import com.gentooboy.javabom.boardapi.repository.ArticlesRepository;
+import com.gentooboy.javabom.boardapi.service.ArticlesService;
+import com.gentooboy.javabom.boardapi.service.ArticlesServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -114,8 +116,7 @@ public class ArticleServiceImplTest {
   public void whenFindByWrongArticleId_thenThrowException() {
     final String  wrongArticleId = "3";
 
-    ArticleNotFoundException exception = new ArticleNotFoundException(ArticleConst.MESSAGE_NOT_FOUND);
-    when(articlesRepository.findById(Long.valueOf(wrongArticleId))).thenThrow(exception);
+    when(articlesRepository.findById(Long.valueOf(wrongArticleId))).thenReturn(Optional.empty());
 
     articlesService.findArticleById(wrongArticleId);
   }
@@ -145,8 +146,7 @@ public class ArticleServiceImplTest {
         .attributes(new Attributes(willUpdateArticleEntity.getTitle(), willUpdateArticleEntity.getContent()))
         .build();
 
-    when(articlesRepository.existsById(willUpdateArticleEntity.getId())).thenReturn(true);
-    when(articlesRepository.save(any(ArticleEntity.class))).thenReturn(willUpdateArticleEntity);
+    when(articlesRepository.findById(willUpdateArticleEntity.getId())).thenReturn(Optional.of(willUpdateArticleEntity));
 
     final Article article = articlesService.updateArticle(willUpdateArticleEntity.getId().toString(), updateArticle);
 
@@ -165,8 +165,7 @@ public class ArticleServiceImplTest {
         .attributes(new Attributes(willUpdateArticleEntity.getTitle(), willUpdateArticleEntity.getContent()))
         .build();
 
-    ArticleNotFoundException exception = new ArticleNotFoundException(ArticleConst.MESSAGE_NOT_FOUND);
-    when(articlesRepository.findById(Long.valueOf(wrongArticleId))).thenThrow(exception);
+    when(articlesRepository.findById(Long.valueOf(wrongArticleId))).thenReturn(Optional.empty());
 
     articlesService.updateArticle(wrongArticleId, updateArticle);
   }

@@ -6,6 +6,7 @@ import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.response.ArticleData;
 import com.gentooboy.javabom.boardapi.service.ArticlesService;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,13 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(ArticleConst.CONTEXT_ARTICLE)
+@RequiredArgsConstructor
 public class ArticlesController {
 
   private final ArticlesService articlesService;
-
-  public ArticlesController(ArticlesService articlesService) {
-    this.articlesService = articlesService;
-  }
 
   @GetMapping("")
   public ResponseEntity<ArticleData> getArticleList() {
@@ -72,6 +70,6 @@ public class ArticlesController {
   public ResponseEntity<ArticleData> deleteArticle(@PathVariable final String articleId) {
     articlesService.deleteArticle(articleId);
 
-    return new ResponseEntity<>(new ArticleData<>(""), HttpStatus.OK);
+    return new ResponseEntity<>(null, HttpStatus.OK);
   }
 }

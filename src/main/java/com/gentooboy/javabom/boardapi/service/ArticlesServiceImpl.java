@@ -10,16 +10,15 @@ import com.gentooboy.javabom.boardapi.repository.ArticlesRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ArticlesServiceImpl implements ArticlesService {
 
   private final ArticlesRepository articlesRepository;
-
-  public ArticlesServiceImpl(ArticlesRepository articlesRepository) {
-    this.articlesRepository = articlesRepository;
-  }
 
   @Override
   public List<Article> findAllArticles() {
@@ -56,11 +55,21 @@ public class ArticlesServiceImpl implements ArticlesService {
   @Override
   public Article updateArticle(final String articleId, Article article)
       throws ArticleNotFoundException {
-    if (!articlesRepository.existsById(ConvertArticleId(articleId))) {
-      throw new ArticleNotFoundException(ArticleConst.MESSAGE_NOT_FOUND);
+    Optional<ArticleEntity> found = articlesRepository.findById(ConvertArticleId(articleId));
+
+    ArticleNotFoundException exception = new ArticleNotFoundException(
+        ArticleConst.MESSAGE_NOT_FOUND);
+    ArticleEntity articleEntity = found.orElseThrow(() -> exception);
+
+    final String title = article.getAttributes().getTitle();
+    if (title != null && title.trim().length() != 0) {
+      articleEntity.setTitle(title);
     }
 
-    ArticleEntity articleEntity = articlesRepository.save(ConvertArticleToEntity(article));
+    final String content = article.getAttributes().getContent();
+    if (content != null) {
+      articleEntity.setContent(content);
+    }
 
     return ConvertEntityToArticle(articleEntity);
   }

@@ -1,4 +1,4 @@
-package com.gentooboy.javabom.boardapi.controller;
+package com.gentooboy.javabom.boardapi.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -7,13 +7,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gentooboy.javabom.boardapi.constant.ArticleConst;
+import com.gentooboy.javabom.boardapi.controller.ArticlesController;
 import com.gentooboy.javabom.boardapi.exception.ArticleNotFoundException;
 import com.gentooboy.javabom.boardapi.model.articles.Article;
 import com.gentooboy.javabom.boardapi.model.articles.Attributes;
@@ -25,6 +25,7 @@ import com.gentooboy.javabom.boardapi.service.ArticlesService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +54,14 @@ public class ArticlesControllerTest {
 
   private static final String BASE_URL = ArticleConst.CONTEXT_ARTICLE;
   private static final String ENCODING = "utf-8";
+  private static final String POINTER_SOURCE = "/data/type/articles/";
+  private static final int SINGLE_ARTICLE_DATA_SIZE = 4;
 
-  private final Article article1;
-  private final Article article2;
+  private Article article1;
+  private Article article2;
 
-  public ArticlesControllerTest() {
+  @Before
+  public void setUp() {
     String articleId = "1";
     article1 = Article.builder()
         .type(ArticleConst.TYPE_ARTICLES)
@@ -152,7 +156,7 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.data.size()").value(4))
+        .andExpect(jsonPath("$.data.size()").value(SINGLE_ARTICLE_DATA_SIZE))
         .andExpect(jsonPath("$.data.type").value(article1.getType()))
         .andExpect(jsonPath("$.data.id").value(article1.getId()))
         .andExpect(jsonPath("$.data.attributes.title").value(article1.getAttributes().getTitle()))
@@ -164,7 +168,7 @@ public class ArticlesControllerTest {
   public void whenGetArticle_thenReturnErrorNotFound() throws Exception {
     final String articleId = "0";
     final Error error = Error.builder()
-        .source(new Source("/data/type/articles/" + articleId))
+        .source(new Source(POINTER_SOURCE + articleId))
         .message(ArticleConst.MESSAGE_NOT_FOUND)
         .build();
 
@@ -177,7 +181,7 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isNotFound())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.error.size()").value(4))
+        .andExpect(jsonPath("$.error.size()").value(SINGLE_ARTICLE_DATA_SIZE))
         .andExpect(jsonPath("$.error.status").value(String.valueOf(HttpStatus.NOT_FOUND.value())))
         .andExpect(jsonPath("$.error.source.pointer").value(error.getSource().getPointer()))
         .andExpect(jsonPath("$.error.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
@@ -199,13 +203,12 @@ public class ArticlesControllerTest {
     final ResultActions actions = mockMvc.perform(post(BASE_URL)
         .contentType(MediaType.APPLICATION_JSON)
         .characterEncoding(ENCODING)
-        .content(objectMapper.writeValueAsString(newArticleData)))
-        .andDo(print());
+        .content(objectMapper.writeValueAsString(newArticleData)));
 
     actions
         .andExpect(status().isCreated())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.data.size()").value(4))
+        .andExpect(jsonPath("$.data.size()").value(SINGLE_ARTICLE_DATA_SIZE))
         .andExpect(jsonPath("$.data.type").value(article1.getType()))
         .andExpect(jsonPath("$.data.id").value(article1.getId()))
         .andExpect(jsonPath("$.data.attributes.title").value(article1.getAttributes().getTitle()))
@@ -228,7 +231,7 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.data.size()").value(4))
+        .andExpect(jsonPath("$.data.size()").value(SINGLE_ARTICLE_DATA_SIZE))
         .andExpect(jsonPath("$.data.type").value(article1.getType()))
         .andExpect(jsonPath("$.data.id").value(article1.getId()))
         .andExpect(jsonPath("$.data.attributes.title").value(article1.getAttributes().getTitle()))
@@ -239,7 +242,7 @@ public class ArticlesControllerTest {
   @Test
   public void whenUpdateArticle_thenReturnNotFound() throws Exception {
     final Error error = Error.builder()
-        .source(new Source("/data/type/articles/" + article1.getId()))
+        .source(new Source(POINTER_SOURCE + article1.getId()))
         .message(ArticleConst.MESSAGE_NOT_FOUND)
         .build();
 
@@ -258,7 +261,7 @@ public class ArticlesControllerTest {
     actions
         .andExpect(status().isNotFound())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.error.size()").value(4))
+        .andExpect(jsonPath("$.error.size()").value(SINGLE_ARTICLE_DATA_SIZE))
         .andExpect(jsonPath("$.error.status").value(String.valueOf(HttpStatus.NOT_FOUND.value())))
         .andExpect(jsonPath("$.error.source.pointer").value(error.getSource().getPointer()))
         .andExpect(jsonPath("$.error.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()))
@@ -274,8 +277,6 @@ public class ArticlesControllerTest {
 
     actions
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-        .andExpect(jsonPath("$.size()").value(1))
-        .andExpect(jsonPath("$.data").value(""));
+        .andExpect(jsonPath("$").doesNotExist());
   }
 }
