@@ -1,5 +1,9 @@
 package com.gentooboy.javabom.boardapi.constant;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArticleConst {
   public static final String CONTEXT_PATH = "/api/v1";
   public static final String CONTEXT_ARTICLE = "/articles";
