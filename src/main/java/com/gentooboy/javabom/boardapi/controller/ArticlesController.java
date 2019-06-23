@@ -27,9 +27,9 @@ public class ArticlesController {
 
   @GetMapping("")
   public ResponseEntity<ArticleData> getArticleList() {
-    List<Article> allArticles = articlesService.findAllArticles();
+    final List<Article> allArticles = articlesService.findAllArticles();
 
-    ArticleData articleData = new ArticleData<>(allArticles);
+    final ArticleData articleData = new ArticleData<>(allArticles);
 
     if (allArticles.isEmpty()) {
       return new ResponseEntity<>(articleData, HttpStatus.NO_CONTENT);
@@ -41,18 +41,14 @@ public class ArticlesController {
   @GetMapping("/{articleId}")
   public ResponseEntity<ArticleData> getArticle(@PathVariable final String articleId)
       throws ArticleNotFoundException {
-    Article article;
-
-    article = articlesService.findArticleById(articleId);
+    final Article article = articlesService.findArticleById(articleId);
 
     return new ResponseEntity<>(new ArticleData<>(article), HttpStatus.OK);
   }
 
   @PostMapping("")
   public ResponseEntity<?> newArticle(@RequestBody final ArticleData<Article> articleData) {
-    Article article;
-
-    article = articlesService.saveArticle(articleData.getData());
+    final Article article = articlesService.saveArticle(articleData.getData());
 
     return new ResponseEntity<>(new ArticleData<>(article), HttpStatus.CREATED);
   }
@@ -61,7 +57,7 @@ public class ArticlesController {
   public ResponseEntity<ArticleData> editArticle(@PathVariable final String articleId,
       @RequestBody final ArticleData<Article> articleData)
       throws ArticleNotFoundException {
-    Article article = articlesService.updateArticle(articleId, articleData.getData());
+    final Article article = articlesService.updateArticle(articleId, articleData.getData());
 
     return new ResponseEntity<>(new ArticleData<>(article), HttpStatus.OK);
   }
