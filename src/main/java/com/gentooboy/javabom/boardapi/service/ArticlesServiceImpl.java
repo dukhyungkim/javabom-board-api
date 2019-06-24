@@ -10,7 +10,6 @@ import com.gentooboy.javabom.boardapi.repository.ArticlesRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +21,12 @@ public class ArticlesServiceImpl implements ArticlesService {
 
   @Override
   public List<Article> findAllArticles() {
-    List<ArticleEntity> articleEntityList = articlesRepository.findAll();
+    final List<ArticleEntity> articleEntityList = articlesRepository.findAll();
 
-    List<Article> articleList = new ArrayList<>();
+    final List<Article> articleList = new ArrayList<>();
 
     for (ArticleEntity articleEntity : articleEntityList) {
-      Article article = ConvertEntityToArticle(articleEntity);
+      final Article article = ConvertEntityToArticle(articleEntity);
       articleList.add(article);
     }
 
@@ -35,12 +34,11 @@ public class ArticlesServiceImpl implements ArticlesService {
   }
 
   @Override
-  public Article findArticleById(String articleId) throws ArticleNotFoundException {
-    Optional<ArticleEntity> found = articlesRepository.findById(ConvertArticleId(articleId));
+  public Article findArticleById(final String articleId) throws ArticleNotFoundException {
+    final Optional<ArticleEntity> found = articlesRepository.findById(ConvertArticleId(articleId));
 
-    ArticleNotFoundException exception = new ArticleNotFoundException(
-        ArticleConst.MESSAGE_NOT_FOUND);
-    ArticleEntity articleEntity = found.orElseThrow(() -> exception);
+    final ArticleEntity articleEntity = found.orElseThrow(() -> new ArticleNotFoundException(
+        ArticleConst.MESSAGE_NOT_FOUND));
 
     return ConvertEntityToArticle(articleEntity);
   }
@@ -53,13 +51,12 @@ public class ArticlesServiceImpl implements ArticlesService {
   }
 
   @Override
-  public Article updateArticle(final String articleId, Article article)
+  public Article updateArticle(final String articleId, final Article article)
       throws ArticleNotFoundException {
-    Optional<ArticleEntity> found = articlesRepository.findById(ConvertArticleId(articleId));
+    final Optional<ArticleEntity> found = articlesRepository.findById(ConvertArticleId(articleId));
 
-    ArticleNotFoundException exception = new ArticleNotFoundException(
-        ArticleConst.MESSAGE_NOT_FOUND);
-    ArticleEntity articleEntity = found.orElseThrow(() -> exception);
+    final ArticleEntity articleEntity = found.orElseThrow(() -> new ArticleNotFoundException(
+        ArticleConst.MESSAGE_NOT_FOUND));
 
     final String title = article.getAttributes().getTitle();
     if (title != null && title.trim().length() != 0) {
@@ -71,7 +68,7 @@ public class ArticlesServiceImpl implements ArticlesService {
       articleEntity.setContent(content);
     }
 
-    return ConvertEntityToArticle(articleEntity);
+    return ConvertEntityToArticle(articlesRepository.save(articleEntity));
   }
 
   @Override
@@ -97,11 +94,11 @@ public class ArticlesServiceImpl implements ArticlesService {
         .build();
   }
 
-  private Long ConvertArticleId(String articleId) {
+  private Long ConvertArticleId(final String articleId) {
     return Long.valueOf(articleId);
   }
 
-  private String ConvertArticleId(Long articleId) {
+  private String ConvertArticleId(final Long articleId) {
     return articleId.toString();
   }
 }

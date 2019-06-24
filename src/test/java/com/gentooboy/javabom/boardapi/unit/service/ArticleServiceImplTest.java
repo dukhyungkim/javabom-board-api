@@ -147,6 +147,7 @@ public class ArticleServiceImplTest {
         .build();
 
     when(articlesRepository.findById(willUpdateArticleEntity.getId())).thenReturn(Optional.of(willUpdateArticleEntity));
+    when(articlesRepository.save(any(ArticleEntity.class))).thenReturn(willUpdateArticleEntity);
 
     final Article article = articlesService.updateArticle(willUpdateArticleEntity.getId().toString(), updateArticle);
 
@@ -159,7 +160,7 @@ public class ArticleServiceImplTest {
 
   @Test(expected = ArticleNotFoundException.class)
   public void whenUpdateNotExistArticle_thenThrowException() {
-    final String  wrongArticleId = "3";
+    final String  wrongArticleId = "1000";
     final Article updateArticle = Article.builder()
         .type(ArticleConst.TYPE_ARTICLES)
         .attributes(new Attributes(willUpdateArticleEntity.getTitle(), willUpdateArticleEntity.getContent()))
