@@ -4,7 +4,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -192,6 +191,21 @@ public class ArticleControllerIntegrationTest {
         .content(objectMapper.writeValueAsString(articleData)));
 
     actions
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(jsonPath("$.data.size()").value(SINGLE_ARTICLE_DATA_SIZE))
+        .andExpect(jsonPath("$.data.type").value(ArticleConst.TYPE_ARTICLES))
+        .andExpect(jsonPath("$.data.id").value(articleList.get(0).getId()))
+        .andExpect(jsonPath("$.data.attributes.title").value(updateTitle))
+        .andExpect(jsonPath("$.data.attributes.content").value(updateContent))
+        .andExpect(jsonPath("$.data.links.self").value(articleList.get(0).getLinks().getSelf()));
+
+    final ResultActions checkActions = mockMvc.perform(get(url)
+        .contentType(MediaType.APPLICATION_JSON)
+        .characterEncoding(ENCODING)
+        .content(objectMapper.writeValueAsString(articleData)));
+
+    checkActions
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
         .andExpect(jsonPath("$.data.size()").value(SINGLE_ARTICLE_DATA_SIZE))

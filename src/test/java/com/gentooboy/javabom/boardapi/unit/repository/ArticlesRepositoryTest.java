@@ -7,7 +7,6 @@ import com.gentooboy.javabom.boardapi.entity.ArticleEntity;
 import com.gentooboy.javabom.boardapi.repository.ArticlesRepository;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
